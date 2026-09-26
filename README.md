@@ -1,2 +1,1 @@
-# LeadLockAi
-lead lock ai is a done for you  never miss a lead service, landing page Google business  page and Google calender estimate booking, agent call back and text back system plus monitors your Google reviews with n8n workflow 
+# LeadLock AI is a done-for-you "never miss a lead" system for contractors and service businesses (400–20K jobs). Auto-provisions a landing page, Google Business Profile, Google Calendar/Maps sync, review automation, missed-call text-back, and an AI voice agent that answers every call and books the job. Built on Stripe + n8n + Retell AI — clients sign up, pay the setup fee, and the entire system builds itself within 48 hours..
