@@ -1,0 +1,333 @@
+{
+  "name": "LeadLock AI - Client Signup Auto-Provisioning (DEMO v1)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-signup",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b9f1295f-6445-4e89-b315-bfc190ef5f69",
+      "name": "Stripe Webhook (checkout.session.completed)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "value": "={{$json.body.data.object.metadata.plan}}",
+              "operation": "equal",
+              "value2": "basic"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0b6681f1-eb1a-4f7b-92cc-f227d235d9e9",
+      "name": "Route by Plan (Robert approves first)",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "client_name",
+              "value": "={{$json.body.data.object.customer_details.name}}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "client_email",
+              "value": "={{$json.body.data.object.customer_details.email}}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "plan",
+              "value": "={{$json.body.data.object.metadata.plan}}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "business_name",
+              "value": "={{$json.body.data.object.metadata.business_name}}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "phone",
+              "value": "={{$json.body.data.object.metadata.phone}}",
+              "type": "string"
+            },
+            {
+              "id": "a6",
+              "name": "stripe_customer_id",
+              "value": "={{$json.body.data.object.customer}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9513a844-c5c7-4857-81a0-b153fe9b2af6",
+      "name": "Map Client Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "CLIENT_MASTER_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Clients",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Business Name": "={{$json.business_name}}",
+            "Contact": "={{$json.client_name}}",
+            "Email": "={{$json.client_email}}",
+            "Phone": "={{$json.phone}}",
+            "Plan": "={{$json.plan}}",
+            "Stripe Customer ID": "={{$json.stripe_customer_id}}",
+            "Status": "PROVISIONING - Robert W review",
+            "Signup Date": "={{$now.format('YYYY-MM-DD')}}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "7fc55503-fb02-463d-a828-d1f938669d32",
+      "name": "Log to Master Sheet (Agent #5)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        920,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "subject": "NEW SIGNUP \u2014 {{$json.business_name}} ({{$json.plan}}) \u2014 Approve provisioning",
+        "emailType": "text",
+        "message": "Robert,\n\nNew client signed up and paid the setup fee.\n\nBusiness: {{$json.business_name}}\nPlan: {{$json.plan}}\nContact: {{$json.client_name}} / {{$json.client_email}} / {{$json.phone}}\nStripe ID: {{$json.stripe_customer_id}}\n\nReply APPROVE to trigger agent provisioning (landing page, GBP, calendar, reviews, agents).\n\n\u2014 LeadLock Automation",
+        "options": {},
+        "sendTo": "robert@yourdomain.com"
+      },
+      "id": "c9345ce6-a1eb-4a52-86e1-ab0af1bef325",
+      "name": "Notify Robert W (Human-in-the-Loop)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1140,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.retellai.com/v2/create_agent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_RETELL_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agent_name\": \"{{$json.business_name}} - Missed Call Agent\",\n  \"voice_id\": \"11labs-Adrian\",\n  \"response_engine\": {\"type\": \"retell-llm\", \"llm_id\": \"LLM_ID_FOR_{{$json.business_name}}\"},\n  \"inbound_webhook_url\": \"https://your-n8n-domain.app/webhook/retell-inbound-{{$json.phone}}\"\n}",
+        "options": {}
+      },
+      "id": "b0b6fe64-56d2-4ed2-9c7d-50f357dc4188",
+      "name": "Provision AI Voice Agent (Agent #3)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/YOUR_SID/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{$json.phone}}"
+            },
+            {
+              "name": "From",
+              "value": "+1YOUR_TWILIO_NUMBER"
+            },
+            {
+              "name": "Body",
+              "value": "={{`Hi ${$json.client_name}, this is LeadLock AI \u2014 your never-miss-a-lead system for ${$json.business_name} is being built right now. Your agent goes live within 48 hours. First month is FREE. Questions? Reply here.`}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dce6be23-bb71-4e0d-9663-98712d3bf633",
+      "name": "Welcome Text-Back (Agent #3 SMS)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"received\",\n  \"message\": \"Signup logged. Robert W. has been notified for approval. Provisioning starts on approval.\",\n  \"client\": {{JSON.stringify($json.business_name)}}\n}"
+      },
+      "id": "c2a068a8-608a-461a-b575-95572a891938",
+      "name": "Stripe Response 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1580,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Stripe Webhook (checkout.session.completed)": {
+      "main": [
+        [
+          {
+            "node": "Route by Plan (Robert approves first)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Plan (Robert approves first)": {
+      "main": [
+        [
+          {
+            "node": "Map Client Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Map Client Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Map Client Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Client Data": {
+      "main": [
+        [
+          {
+            "node": "Log to Master Sheet (Agent #5)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Master Sheet (Agent #5)": {
+      "main": [
+        [
+          {
+            "node": "Notify Robert W (Human-in-the-Loop)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Robert W (Human-in-the-Loop)": {
+      "main": [
+        [
+          {
+            "node": "Provision AI Voice Agent (Agent #3)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Welcome Text-Back (Agent #3 SMS)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Provision AI Voice Agent (Agent #3)": {
+      "main": [
+        [
+          {
+            "node": "Stripe Response 200",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Welcome Text-Back (Agent #3 SMS)": {
+      "main": [
+        [
+          {
+            "node": "Stripe Response 200",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
