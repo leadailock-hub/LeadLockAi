@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>LeadLock AI — Never Miss Another Lead</title>
+<meta name="description" content="Done-for-you lead capture for contractors: AI voice agent answers every missed call, books the job, texts back instantly. $197 setup, first month free.">
+<meta name="theme-color" content="#0d1117">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; }
+  body { background:#0d1117; color:#e6edf3; line-height:1.5; -webkit-text-size-adjust:100%; }
+  .wrap { max-width:920px; margin:0 auto; padding:0 18px; }
+  header { padding:18px 0; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:#0d1117ee; backdrop-filter:blur(8px); z-index:50; }
+  .logo { font-size:20px; font-weight:800; color:#fff; letter-spacing:-0.3px; }
+  .logo span { color:#f0a500; }
+  .btn { display:inline-block; background:#f0a500; color:#0d1117; font-weight:700; padding:14px 24px; border-radius:10px; text-decoration:none; font-size:16px; border:none; cursor:pointer; text-align:center; transition:transform .15s; }
+  .btn:active { transform:scale(0.97); }
+  .btn2 { background:#21262d; color:#e6edf3; border:1px solid #30363d; }
+  .hero { text-align:center; padding:48px 0 40px; }
+  .hero h1 { font-size:clamp(30px,7vw,50px); line-height:1.1; margin-bottom:16px; font-weight:800; }
+  .hero h1 em { color:#f0a500; font-style:normal; }
+  .hero p { font-size:17px; color:#9da7b3; max-width:580px; margin:0 auto 28px; line-height:1.55; }
+  .badge { display:inline-block; background:#12261a; color:#3fb950; border:1px solid #238636; padding:6px 14px; border-radius:99px; font-size:13px; font-weight:600; margin-bottom:20px; }
+  .cta-row { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+  .section { padding:48px 0; }
+  .section h2 { text-align:center; font-size:26px; margin-bottom:6px; font-weight:800; }
+  .sub { text-align:center; color:#9da7b3; margin-bottom:32px; font-size:15px; }
+  .cards { display:grid; gap:16px; }
+  @media(min-width:740px){
+    .cards { grid-template-columns:repeat(3,1fr); }
+    .steps { grid-template-columns:repeat(4,1fr) !important; }
+  }
+  .card { background:#161b22;
